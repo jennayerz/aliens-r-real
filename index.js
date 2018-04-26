@@ -7,9 +7,13 @@ var $countryInput = document.querySelector("#country");
 var $shapeInput = document.querySelector("#shape");
 var $searchBtn = document.querySelector("#search");
 
+var $loadMoreBtn = document.querySelector("#pagination");
+
+var startingIndex = 0;
+var resultsPerPage = 50;
+
 // Add an event listener to the searchButton, call handleSearchButtonClick when clicked
 $searchBtn.addEventListener("click", handleSearchButtonClick);
-
 
 // Set filteredAddresses to addressData initially
 var filteredDataSet = dataSet;
@@ -52,45 +56,29 @@ function handleSearchButtonClick() {
     var countryField = data.country.toLowerCase();
     var shapeField = data.shape.toLowerCase();
 
-    if ((dateTimeField === filterDateTime && cityField === filterCity) ||
-        (dateTimeField === filterDateTime && stateField === filterState) ||
-        (dateTimeField === filterDateTime && countryField === filterCountry) ||
-        (dateTimeField === filterDateTime && shapeField === filterShape)) {
-      return true;
-    }
-
-    else if ((cityField === filterCity && stateField === filterState) ||
-             (cityField === filterCity && countryField === filterCountry) ||
-             (cityField === filterCity && shapeField === filterShape)) {
-      return true;
-    }
-
-    else if ((stateField === filterState && countryField === filterCountry) ||
-             (stateField === filterState && shapeField === filterShape)) {
-      return true;
-    }
-
-    else if ((dateTimeField === filterDateTime && cityField === filterCity && stateField === filterState) ||
-             (dateTimeField === filterDateTime && cityField === filterCity && shapeField === filterShape)) {
-      return true;
-    }
-
-    else if ((cityField === filterCity && stateField === filterState && countryField === filterCountry) ||
-             (cityField === filterCity && stateField === filterState && shapeField === filterShape)) {
-      return true;
-    }
-
-    else if (stateField === filterState && countryField === filterCountry && shapeField === filterShape) {
-      return true;
-    }
-
-    else if (dateTimeField === filterDateTime && cityField === filterCity && stateField === filterState && countryField === filterCountry && shapeField === filterShape) {
-      return true;
-    }
-  return false;
+    var allFields = 
+      (filterDateTime === "" || dateTimeField === filterDateTime) &&
+      (filterCity === "" || cityField === filterCity) &&
+      (filterCountry === "" || countryField === filterCountry) &&
+      (filterState === "" || stateField === filterState) &&
+      (filterShape === "" || shapeField === filterShape);
+    return allFields;
 
   });
   renderTable();
+}
+
+$loadMoreBtn.addEventListener("click", handleButtonClick);
+
+function handleButtonClick() {
+  startingIndex += resultsPerPage;
+  renderTable();
+
+  if (startingIndex + resultsPerPage >= filteredDataSet.length) {
+    $loadMoreBtn.classList.add("disabled");
+    $loadMoreBtn.innerText = "All Data Loaded";
+    $loadMoreBtn.removeEventListener("click", handleButtonClick);
+  }
 }
 
 // Render the table for the first time on page load
